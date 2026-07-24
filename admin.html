@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Administrativo - Agenda por Dia</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .box { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 600px; box-sizing: border-box; margin-bottom: 20px; }
+        h2 { margin-top: 0; color: #d9534f; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        .gerenciar-horarios { display: flex; gap: 10px; margin-bottom: 15px; }
+        input[type="date"], input[type="time"] { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-add { background: #28a745; }
+        .btn-danger { background: #d9534f; padding: 5px 10px; font-size: 12px; }
+        .badge-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; min-height: 40px; padding: 10px; background: #fafafa; border: 1px dashed #ccc; border-radius: 4px; }
+        .badge { background: #007bff; color: white; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-size: 14px; border: 1px solid #0056b3; }
+        .badge span { cursor: pointer; color: #fff; font-weight: bold; background: rgba(0,0,0,0.2); width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .lista-agendamentos { margin-top: 15px; border: 1px solid #ddd; padding: 10px; border-radius: 4px; background: #fafafa; }
+        .agendamento-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .agendamento-item:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+
+<h1 style="color: #333; margin-bottom: 20px;">Painel de Controle por Dia</h1>
+
+<div class="box">
+    <h2>1. Selecione o Dia para Liberar Vagas</h2>
+    <div class="control-group">
+        <input type="date" id="dataFiltro" onchange="mudarDataPainel()">
+    </div>
+
+    <h2>2. Habilitar Horário de Atendimento</h2>
+    <div class="gerenciar-horarios">
+        <input type="time" id="novaHora" value="09:00">
+        <button class="btn btn-add" onclick="adicionarHorario()">+ Abrir Horário</button>
+    </div>
+    
+    <label id="labelGrade">Horários liberados para este dia:</label>
+    <div class="badge-container" id="gradeHorarios"></div>
+</div>
+
+<div class="box">
+    <h2 style="color: #007bff;">Agendamentos Recebidos</h2>
+    <div class="lista-agendamentos" id="listaAgendamentos"></div>
+</div>
+
+<script>
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('dataFiltro').value = sprintfDate(hoje);
+
+    let agendaPorDia = JSON.parse(localStorage.getItem('agendaPorDia')) || {};
+    let agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+
+    function sprintfDate(dateStr) { return dateStr; }
+    function obterDataSelecionada() { return document.getElementById('dataFiltro').value; }
+    function mudarDataPainel() { renderizarGrade(); }
+
+    function renderizarGrade() {
+        const dataSel = obterDataSelecionada();
+        if (!dataSel) return;
+
+        document.getElementById('labelGrade').textContent = `Horários abertos no dia ${dataSel.split('-').reverse().join('/')}:`;
+
+        // INICIALIZAÇÃO FIXADA: Começa totalmente vazio (agenda fechada por padrão)
+        if (!agendaPorDia[dataSel]) {
+            agendaPorDia[dataSel] = [];
+        }
+
+        const container = document.getElementById('gradeHorarios');
+        container.innerHTML = '';
+        
+        agendaPorDia[dataSel].sort();
+
+        if (agendaPorDia[dataSel].length === 0) {
+            container.innerHTML = '<span style="color:#cc0000; font-weight:bold; font-size:14px;">Agenda fechada. Nenhum horário disponível para este dia.</span>';
+        }
+
+        agendaPorDia[dataSel].forEach(hora => {
+            let badge = document.createElement('div');
+            badge.className = 'badge';
+            badge.innerHTML = `${hora} <span onclick="removerHorario('${hora}')" title="Bloquear horário">&times;</span>`;
+            container.appendChild(badge);
+        });
+
+        localStorage.setItem('agendaPorDia', JSON.stringify(agendaPorDia));
+    }
+
+    function adicionarHorario() {
+        const dataSel = obterDataSelecionada();
+        const novaHora = document.getElementById('novaHora').value;
+        if (!dataSel) return alert('Selecione uma data primeiro.');
+
+        if (!agendaPorDia[dataSel].includes(novaHora)) {
+            agendaPorDia[dataSel].push(novaHora);
+            renderizarGrade();
+        } else {
+            alert('Este horário já está aberto nesta data.');
+        }
+    }
+
+    function removerHorario(hora) {
+        const dataSel = obterDataSelecionada();
+        agendaPorDia[dataSel] = agendaPorDia[dataSel].filter(h => h !== hora);
+        renderizarGrade();
+    }
+
+    function renderizarAgendamentos() {
+        const listaDiv = document.getElementById('listaAgendamentos');
+        if (agendamentos.length === 0) {
+            listaDiv.innerHTML = '<p style="color: #777; text-align: center; margin: 10px 0;">Nenhum agendamento realizado.</p>';
+            return;
+        }
+
+        listaDiv.innerHTML = '';
+        agendamentos.forEach((agendamento) => {
+            let item = document.createElement('div');
+            item.className = 'agendamento-item';
+            item.innerHTML = `
+                <div>
+                    <strong>Data: ${agendamento.data.split('-').reverse().join('/')} às ${agendamento.hora}</strong><br>
+                    <span>Cliente: ${agendamento.nome} (${agendamento.telefone})</span>
+                </div>
+                <button class="btn btn-danger" onclick="excluirAgendamento(${agendamento.id})">Concluir</button>
+            `;
+            listaDiv.appendChild(item);
+        });
+    }
+
+    function excluirAgendamento(id) {
+        agendamentos = agendamentos.filter(a => a.id !== id);
+        localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
+        renderizarAgendamentos();
+    }
+
+    window.addEventListener('storage', function() {
+        agendaPorDia = JSON.parse(localStorage.getItem('agendaPorDia')) || {};
+        agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+        renderizarGrade();
+        renderizarAgendamentos();
+    });
+
+    renderizarGrade();
+    renderizarAgendamentos();
+</script>
+
+</body>
+</html>

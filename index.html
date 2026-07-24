@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Agendamento de Atendimento</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+        .box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { margin-top: 0; color: #333; text-align: center; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Área do Cliente</h2>
+    <form id="formCliente">
+        <div class="form-group">
+            <label for="nome">Seu Nome:</label>
+            <input type="text" id="nome" required placeholder="Digite seu nome completo">
+        </div>
+        <div class="form-group">
+            <label for="telefone">Seu WhatsApp:</label>
+            <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
+        </div>
+        <div class="form-group">
+            <label for="data">Escolha a Data:</label>
+            <input type="date" id="data" required onchange="atualizarHorariosDaData()">
+        </div>
+        <div class="form-group">
+            <label for="horario">Escolha o Horário:</label>
+            <select id="horario" required></select>
+        </div>
+        <button type="submit">Confirmar Agendamento</button>
+    </form>
+</div>
+
+<script>
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('data').value = hoje;
+    document.getElementById('data').min = hoje;
+
+    function atualizarHorariosDaData() {
+        const dataSelecionada = document.getElementById('data').value;
+        if (!dataSelecionada) return;
+
+        const agendaPorDia = JSON.parse(localStorage.getItem('agendaPorDia')) || {};
+        const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+
+        // MODIFICAÇÃO FIXADA: Se o administrador não configurou o dia, a lista vem vazia por padrão
+        let horariosDisponiveis = agendaPorDia[dataSelecionada] || [];
+
+        const horariosOcupados = agendamentos.filter(a => a.data === dataSelecionada).map(a => a.hora);
+        const horariosLivres = horariosDisponiveis.filter(hora => !horariosOcupados.includes(hora));
+
+        const selectHorario = document.getElementById('horario');
+        selectHorario.innerHTML = '';
+        
+        if (horariosLivres.length === 0) {
+            let option = document.createElement('option');
+            option.textContent = "Nenhum horário livre para este dia";
+            option.value = "";
+            selectHorario.appendChild(option);
+            return;
+        }
+
+        horariosLivres.forEach(hora => {
+            let option = document.createElement('option');
+            option.value = hora;
+            option.textContent = hora;
+            selectHorario.appendChild(option);
+        });
+    }
+
+    document.getElementById('formCliente').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const horaSel = document.getElementById('horario').value;
+        if (!horaSel) return alert('Por favor, selecione uma data que possua horários livres.');
+
+        const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+
+        const novoAgendamento = {
+            id: Date.now(),
+            nome: document.getElementById('nome').value,
+            telefone: document.getElementById('telefone').value,
+            data: document.getElementById('data').value,
+            hora: horaSel
+        };
+
+        agendamentos.push(novoAgendamento);
+        localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
+
+        document.getElementById('formCliente').reset();
+        document.getElementById('data').value = hoje;
+        atualizarHorariosDaData();
+        
+        alert('Agendamento realizado com sucesso!');
+    });
+
+    window.addEventListener('storage', function() {
+        atualizarHorariosDaData();
+    });
+
+    atualizarHorariosDaData();
+</script>
+
+</body>
+</html>
