@@ -64,7 +64,6 @@
             color: #666 !important;
             cursor: not-allowed;
         }
-        /* POPUP/MODAL DE CONFIRMAÇÃO */
         .modal-sucesso {
             display: none;
             position: fixed;
@@ -117,7 +116,7 @@
         <div class="form-group">
             <label for="servico">Escolha o Serviço:</label>
             <select id="servico" required>
-                <option value="Bronzeamento">Bronzeamento</option>
+                <option value="Serviço Padrão 1">Serviço Padrão 1</option>
                 <option value="Serviço Completo 2">Serviço Completo 2</option>
                 <option value="Consulta Avançada">Consulta Avançada</option>
                 <option value="Manutenção Geral">Manutenção Geral</option>
@@ -135,11 +134,10 @@
     </form>
 </div>
 
-<!-- TELA POPUP QUE VAI APARECER APÓS O CLIQUE -->
 <div id="meuModal" class="modal-sucesso">
     <div class="modal-conteudo">
         <h3 style="color: #28a745; margin-top: 0;">🎉 Quase Pronto!</h3>
-        <p style="color: #555; font-size: 15px; line-height: 1.4;">Seus dados foram reservados no sistema. Agora, clique no botão abaixo para enviar o comprovante e finalizar pelo WhatsApp.</p>
+        <p style="color: #555; font-size: 15px; line-height: 1.4;">Seus dados foram salvos no painel. Clique no botão abaixo para abrir seu WhatsApp e enviar os detalhes da sua reserva.</p>
         <a id="linkWhatsFinal" href="#" class="btn-whats-final">🟢 ENVIAR NO WHATSAPP</a>
     </div>
 </div>
@@ -148,14 +146,12 @@
     // ==========================================
     // CONFIGURAÇÃO: INSIRA SEU WHATSAPP REAL AQUI
     // IMPORTANTE: Use o formato "55" + DDD + Número. Apenas números!
-    const SEU_NUMERO_WHATSAPP = "5583998057576"; 
+    const SEU_NUMERO_WHATSAPP = "5500000000000"; 
     // ==========================================
 
-    const hoje = new Date().toISOString().split('T');
+    const hoje = new Date().toISOString().split('T')[0];
     document.getElementById('data').value = hoje;
-    document.getElementById('data').min = ServerDate();
-
-    function ServerDate() { return hoje[0]; }
+    document.getElementById('data').min = hoje;
 
     function atualizarHorariosDaData() {
         const dataSelecionada = document.getElementById('data').value;
@@ -226,15 +222,12 @@
                               "📅 Data: " + dataFormatada + "\n" +
                               "⏰ Horário: " + horaSel;
 
-        const urlLinkLink = "https://whatsapp.com" + SEU_NUMERO_WHATSAPP + "&text=" + encodeURIComponent(textoMensagem);
+        // ATUALIZAÇÃO DA URL: Usando o formato 'wa.me' à prova de bloqueios de navegadores mobile
+        const urlLinkLink = "https://wa.me" + SEU_NUMERO_WHATSAPP + "?text=" + encodeURIComponent(textoMensagem);
 
-        // Configura o link do botão final do WhatsApp dentro do popup
         document.getElementById('linkWhatsFinal').href = urlLinkLink;
-
-        // Abre a caixinha de aviso na tela do cliente
         document.getElementById('meuModal').style.display = "flex";
 
-        // Limpa o formulário de fundo
         document.getElementById('formCliente').reset();
         document.getElementById('data').value = hoje;
         atualizarHorariosDaData();
