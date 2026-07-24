@@ -6,7 +6,7 @@
     <title>Agendamento de Atendimento</title>
     <style>
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background-color: #f4f7f6; 
             margin: 0; 
             padding: 12px; 
@@ -16,7 +16,6 @@
             min-height: 100vh;
             box-sizing: border-box;
         }
-
         .btn-adm-topo { 
             background: #333; 
             color: white; 
@@ -26,9 +25,7 @@
             font-weight: bold; 
             margin-bottom: 15px; 
             font-size: 12px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
         }
-
         .box { 
             background: white; 
             padding: 20px; 
@@ -38,14 +35,9 @@
             max-width: 450px; 
             box-sizing: border-box; 
         }
-
-        .logo-container { text-align: center; margin-bottom: 15px; }
-        .logo-container img { max-width: 100px; height: auto; border-radius: 50%; }
-
         h2 { margin-top: 0; color: #333; text-align: center; border-bottom: 2px solid #25d366; padding-bottom: 10px; font-size: 20px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: bold; color: #555; font-size: 14px; }
-        
         input, select { 
             width: 100%; 
             padding: 14px 12px; 
@@ -54,15 +46,7 @@
             box-sizing: border-box; 
             font-size: 16px; 
             background-color: #fff;
-            -webkit-appearance: none; 
         }
-        
-        input:focus, select:focus {
-            border-color: #25d366;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.2);
-        }
-
         button { 
             width: 100%; 
             padding: 15px; 
@@ -74,10 +58,7 @@
             cursor: pointer; 
             font-weight: bold; 
             margin-top: 10px; 
-            box-shadow: 0 3px 6px rgba(37, 211, 102, 0.3);
-            -webkit-tap-highlight-color: transparent;
         }
-        button:active { background: #128c7e; transform: scale(0.99); }
     </style>
 </head>
 <body>
@@ -85,10 +66,6 @@
 <a href="admin.html" class="btn-adm-topo">⚙️ Painel de Controle</a>
 
 <div class="box">
-    <div class="logo-container">
-        <img src="logo.png" onerror="this.style.display='none'" alt="Logo">
-    </div>
-
     <h2>Agendar Atendimento</h2>
     <form id="formCliente">
         <div class="form-group">
@@ -102,7 +79,6 @@
         <div class="form-group">
             <label for="servico">Escolha o Serviço:</label>
             <select id="servico" required>
-                <!-- Altere os serviços abaixo conforme o seu negócio -->
                 <option value="Serviço Padrão 1">Serviço Padrão 1</option>
                 <option value="Serviço Completo 2">Serviço Completo 2</option>
                 <option value="Consulta Avançada">Consulta Avançada</option>
@@ -122,8 +98,13 @@
 </div>
 
 <script>
-    const SEU_NUMERO_WHATSAPP = "5583998057576"; // Lembre de colocar seu número real aqui!
+    // ==========================================
+    // CONFIGURAÇÃO: INSIRA SEU WHATSAPP REAL AQUI
+    // Apenas números! Exemplo: "5511999999999"
+    const SEU_NUMERO_WHATSAPP = "5500000000000"; 
+    // ==========================================
 
+    // Define a data mínima como hoje automaticamente
     const hoje = new Date().toISOString().split('T')[0];
     document.getElementById('data').value = hoje;
     document.getElementById('data').min = hoje;
@@ -160,26 +141,41 @@
 
     document.getElementById('formCliente').addEventListener('submit', function(e) {
         e.preventDefault();
+        
         const horaSel = document.getElementById('horario').value;
-        if (!horaSel) return alert('Por favor, selecione uma data que possua horários livres.');
+        if (!horaSel) {
+            alert('Por favor, selecione um dia que possua horários livres.');
+            return;
+        }
 
-        const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
         const nome = document.getElementById('nome').value;
         const telefone = document.getElementById('telefone').value;
         const servico = document.getElementById('servico').value;
         const data = document.getElementById('data').value;
         const dataFormatada = data.split('-').reverse().join('/');
 
-        const novoAgendamento = { id: Date.now(), nome, telefone, servico, data, hora: horaSel };
+        // Salva localmente para aparecer no painel adm
+        const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+        const novoAgendamento = { id: Date.now(), nome: nome, telefone: telefone, servico: servico, data: data, hora: horaSel };
         agendamentos.push(novoAgendamento);
         localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
 
-        const textoMensagem = `Olá! Gostaria de confirmar um agendamento:\n\n👤 *Nome:* ${nome}\n📱 *Contato:* ${telefone}\n🛠️ *Serviço:* ${servico}\n📅 *Data:* ${dataFormatada}\n⏰ *Horário:* ${horaSel}`;
-        const urlLinkLink = `https://whatsapp.com{SEU_NUMERO_WHATSAPP}&text=${encodeURIComponent(textoMensagem)}`;
+        // Monta o texto limpo para a API do WhatsApp
+        const textoMensagem = "Olá! Gostaria de confirmar um agendamento:\n\n" +
+                              "👤 Nome: " + nome + "\n" +
+                              "📱 Contato: " + telefone + "\n" +
+                              "🛠️ Serviço: " + servico + "\n" +
+                              "📅 Data: " + dataFormatada + "\n" +
+                              "⏰ Horário: " + horaSel;
 
+        const urlLinkLink = "https://whatsapp.com" + SEU_NUMERO_WHATSAPP + "&text=" + encodeURIComponent(textoMensagem);
+
+        // Limpa o formulário antes de ir para o WhatsApp
         document.getElementById('formCliente').reset();
         document.getElementById('data').value = hoje;
         atualizarHorariosDaData();
+
+        // Envio definitivo aceito por qualquer celular
         window.location.href = urlLinkLink;
     });
 
