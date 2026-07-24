@@ -7,7 +7,7 @@
     <style>
         body { 
             display: none; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background-color: #f4f7f6; 
             margin: 0; 
             padding: 12px; 
@@ -17,7 +17,37 @@
             box-sizing: border-box;
         }
         
-        h1 { font-size: 22px; color: #333; text-align: center; margin: 10px 0 20px 0; }
+        /* MENU SUPERIOR COM DOIS BOTÕES NO ADMIN */
+        .menu-topo {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 450px;
+        }
+        .btn-menu {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        .btn-ativo {
+            background: #d9534f;
+            color: white;
+        }
+        .btn-inativo {
+            background: #e9ecef;
+            color: #333;
+            border: 1px solid #ced4da;
+        }
+        .btn-inativo:hover {
+            background: #dee2e6;
+        }
 
         .box { 
             background: white; 
@@ -118,7 +148,7 @@
     </style>
     
     <script>
-        const SENHA_CORRETA = "MINHASENHA123"; // Altere para a sua senha!
+        const SENHA_CORRETA = "MINHASENHA123"; // Defina sua senha aqui!
 
         function verificarAcesso() {
             if (sessionStorage.getItem('logado') === 'true') {
@@ -150,7 +180,11 @@
 </head>
 <body>
 
-<h1>Painel de Controle Mobile</h1>
+<!-- MENU DE NAVEGAÇÃO NO ADMIN -->
+<div class="menu-topo">
+    <a href="index.html" class="btn-menu btn-inativo">📅 Fazer Agendamento</a>
+    <a href="admin.html" class="btn-menu btn-ativo">⚙️ Painel de Controle</a>
+</div>
 
 <div class="box">
     <h2>1. Selecione a Data</h2>
@@ -174,7 +208,7 @@
 </div>
 
 <script>
-    const hoje = new Date().toISOString().split('T')[0];
+    const hoje = new Date().toISOString().split('T');
     document.getElementById('dataFiltro').value = hoje;
 
     let agendaPorDia = JSON.parse(localStorage.getItem('agendaPorDia')) || {};
@@ -259,12 +293,4 @@
     }
 
     window.addEventListener('storage', function() {
-        agendaPorDia = JSON.parse(localStorage.getItem('agendaPorDia')) || {};
-        agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
-        renderizarGrade();
-        renderizarAgendamentos();
-    });
-</script>
-
-</body>
-</html>
+agendaPorDia = JSON.parse(localStorage.getItem('agendaPorDia')) || {};agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];renderizarGrade();renderizarAgendamentos();});
