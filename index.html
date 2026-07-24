@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <!-- Esta tag abaixo é OBRIGATÓRIA para o site se ajustar ao tamanho da tela do celular -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agendamento de Atendimento</title>
     <style>
-        /* Estilos base focados em toque mobile */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background-color: #f4f7f6; 
@@ -19,7 +17,6 @@
             box-sizing: border-box;
         }
 
-        /* Botão do Admin discreto no topo */
         .btn-adm-topo { 
             background: #333; 
             color: white; 
@@ -32,7 +29,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
         }
 
-        /* Container flexível: ocupa 100% da tela no mobile, mas limita em telas grandes */
         .box { 
             background: white; 
             padding: 20px; 
@@ -43,31 +39,22 @@
             box-sizing: border-box; 
         }
 
-        /* Estilo da Logo ou Foto do Topo */
-        .logo-container {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .logo-container img {
-            max-width: 100px;
-            height: auto;
-            border-radius: 50%; /* Remove se sua logo não for redonda */
-        }
+        .logo-container { text-align: center; margin-bottom: 15px; }
+        .logo-container img { max-width: 100px; height: auto; border-radius: 50%; }
 
         h2 { margin-top: 0; color: #333; text-align: center; border-bottom: 2px solid #25d366; padding-bottom: 10px; font-size: 20px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: bold; color: #555; font-size: 14px; }
         
-        /* Inputs maiores para facilitar o clique com o dedo */
         input, select { 
             width: 100%; 
             padding: 14px 12px; 
             border: 1px solid #ccc; 
             border-radius: 8px; 
             box-sizing: border-box; 
-            font-size: 16px; /* Evita que o iPhone dê zoom automático ao clicar no campo */
+            font-size: 16px; 
             background-color: #fff;
-            -webkit-appearance: none; /* Remove estilos padrão do Safari no iOS */
+            -webkit-appearance: none; 
         }
         
         input:focus, select:focus {
@@ -76,7 +63,6 @@
             box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.2);
         }
 
-        /* Botão do WhatsApp grande e chamativo */
         button { 
             width: 100%; 
             padding: 15px; 
@@ -99,9 +85,7 @@
 <a href="admin.html" class="btn-adm-topo">⚙️ Painel de Controle</a>
 
 <div class="box">
-    <!-- ESPAÇO DA SUA LOGO -->
     <div class="logo-container">
-        <!-- Substitua 'logo.png' pelo nome da sua imagem quando subir no GitHub -->
         <img src="logo.png" onerror="this.style.display='none'" alt="Logo">
     </div>
 
@@ -114,6 +98,16 @@
         <div class="form-group">
             <label for="telefone">Seu WhatsApp:</label>
             <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
+        </div>
+        <div class="form-group">
+            <label for="servico">Escolha o Serviço:</label>
+            <select id="servico" required>
+                <!-- Altere os serviços abaixo conforme o seu negócio -->
+                <option value="Serviço Padrão 1">Serviço Padrão 1</option>
+                <option value="Serviço Completo 2">Serviço Completo 2</option>
+                <option value="Consulta Avançada">Consulta Avançada</option>
+                <option value="Manutenção Geral">Manutenção Geral</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="data">Escolha o Dia:</label>
@@ -172,14 +166,15 @@
         const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
         const nome = document.getElementById('nome').value;
         const telefone = document.getElementById('telefone').value;
+        const servico = document.getElementById('servico').value;
         const data = document.getElementById('data').value;
         const dataFormatada = data.split('-').reverse().join('/');
 
-        const novoAgendamento = { id: Date.now(), nome, telefone, data, hora: horaSel };
+        const novoAgendamento = { id: Date.now(), nome, telefone, servico, data, hora: horaSel };
         agendamentos.push(novoAgendamento);
         localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
 
-        const textoMensagem = `Olá! Gostaria de confirmar um agendamento:\n\n👤 *Nome:* ${nome}\n📱 *Contato:* ${telefone}\n📅 *Data:* ${dataFormatada}\n⏰ *Horário:* ${horaSel}`;
+        const textoMensagem = `Olá! Gostaria de confirmar um agendamento:\n\n👤 *Nome:* ${nome}\n📱 *Contato:* ${telefone}\n🛠️ *Serviço:* ${servico}\n📅 *Data:* ${dataFormatada}\n⏰ *Horário:* ${horaSel}`;
         const urlLinkLink = `https://whatsapp.com{SEU_NUMERO_WHATSAPP}&text=${encodeURIComponent(textoMensagem)}`;
 
         document.getElementById('formCliente').reset();
