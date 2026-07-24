@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - Protegido</title>
     <style>
-        /* Oculta o conteúdo por padrão até a senha ser validada */
         body { 
             display: none; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
@@ -119,36 +118,26 @@
     </style>
     
     <script>
-        // ===================================================
-        // CONFIGURAÇÃO: DEFINA A SUA SENHA DE ACESSO ABAIXO
-        // Alterar o texto dentro das aspas para a sua senha pessoal
-        // ===================================================
-        const SENHA_CORRETA = "MINHASENHA123";
-        // ===================================================
+        const SENHA_CORRETA = "MINHASENHA123"; // Altere para a sua senha!
 
         function verificarAcesso() {
-            // Verifica se o administrador já fez login nesta sessão do navegador
             if (sessionStorage.getItem('logado') === 'true') {
                 liberarPagina();
                 return;
             }
 
-            // Caso contrário, solicita a senha em uma caixa pop-up
             let senhaDigitada = prompt("Acesso Restrito. Digite a senha do Administrador:");
 
             if (senhaDigitada === SENHA_CORRETA) {
-                // Guarda o estado logado apenas enquanto a aba do navegador estiver aberta
                 sessionStorage.setItem('logado', 'true');
                 liberarPagina();
             } else {
                 alert("Senha incorreta! Você será redirecionado.");
-                // Redireciona de volta para a tela inicial do cliente
                 window.location.href = "index.html"; 
             }
         }
 
         function liberarPagina() {
-            // Executa após a validação da senha para exibir o HTML estruturado
             document.addEventListener("DOMContentLoaded", function() {
                 document.body.style.display = "flex";
                 renderizarGrade();
@@ -156,7 +145,6 @@
             });
         }
 
-        // Executa o bloqueio imediatamente ao carregar o arquivo
         verificarAcesso();
     </script>
 </head>
@@ -186,7 +174,7 @@
 </div>
 
 <script>
-    const hoje = new Date().toISOString().split('T');
+    const hoje = new Date().toISOString().split('T')[0];
     document.getElementById('dataFiltro').value = hoje;
 
     let agendaPorDia = JSON.parse(localStorage.getItem('agendaPorDia')) || {};
@@ -255,7 +243,8 @@
                 <div class="agendamento-info">
                     <strong style="color:#007bff;">📅 ${agendamento.data.split('-').reverse().join('/')} às ${agendamento.hora}</strong><br>
                     <strong>👤 Cliente:</strong> ${agendamento.nome}<br>
-                    <strong>📱 Whats:</strong> ${agendamento.telefone}
+                    <strong>📱 Whats:</strong> ${agendamento.telefone}<br>
+                    <strong>🛠️ Serviço:</strong> ${agendamento.servico || 'Não especificado'}
                 </div>
                 <button class="btn btn-danger" onclick="excluirAgendamento(${agendamento.id})">Marcar como Concluído</button>
             `;
