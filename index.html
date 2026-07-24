@@ -47,10 +47,10 @@
             font-size: 16px; 
             background-color: #fff;
         }
-        button { 
+        .btn-acao { 
             width: 100%; 
             padding: 15px; 
-            background: #25d366; 
+            background: #007bff; 
             color: white; 
             border: none; 
             border-radius: 8px; 
@@ -58,6 +58,44 @@
             cursor: pointer; 
             font-weight: bold; 
             margin-top: 10px; 
+        }
+        button:disabled {
+            background: #ccc !important;
+            color: #666 !important;
+            cursor: not-allowed;
+        }
+        /* POPUP/MODAL DE CONFIRMAÇÃO */
+        .modal-sucesso {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            box-sizing: border-box;
+            z-index: 9999;
+        }
+        .modal-conteudo {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .btn-whats-final {
+            display: block;
+            background: #25d366;
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
         }
     </style>
 </head>
@@ -91,23 +129,33 @@
         </div>
         <div class="form-group">
             <label for="horario">Escolha o Horário:</label>
-            <select id="horario" required></select>
+            <select id="horario" required onchange="validarBotao()"></select>
         </div>
-        <button type="submit">Confirmar pelo WhatsApp</button>
+        <button type="submit" id="btnEnviar" class="btn-acao">Avançar Agendamento</button>
     </form>
+</div>
+
+<!-- TELA POPUP QUE VAI APARECER APÓS O CLIQUE -->
+<div id="meuModal" class="modal-sucesso">
+    <div class="modal-conteudo">
+        <h3 style="color: #28a745; margin-top: 0;">🎉 Quase Pronto!</h3>
+        <p style="color: #555; font-size: 15px; line-height: 1.4;">Seus dados foram reservados no sistema. Agora, clique no botão abaixo para enviar o comprovante e finalizar pelo WhatsApp.</p>
+        <a id="linkWhatsFinal" href="#" class="btn-whats-final">🟢 ENVIAR NO WHATSAPP</a>
+    </div>
 </div>
 
 <script>
     // ==========================================
     // CONFIGURAÇÃO: INSIRA SEU WHATSAPP REAL AQUI
-    // Apenas números! Exemplo: "5511999999999"
-    const SEU_NUMERO_WHATSAPP = "5500000000000"; 
+    // IMPORTANTE: Use o formato "55" + DDD + Número. Apenas números!
+    const SEU_NUMERO_WHATSAPP = "5583998057576"; 
     // ==========================================
 
-    // Define a data mínima como hoje automaticamente
-    const hoje = new Date().toISOString().split('T')[0];
+    const hoje = new Date().toISOString().split('T');
     document.getElementById('data').value = hoje;
-    document.getElementById('data').min = hoje;
+    document.getElementById('data').min = ServerDate();
+
+    function ServerDate() { return hoje[0]; }
 
     function atualizarHorariosDaData() {
         const dataSelecionada = document.getElementById('data').value;
@@ -125,28 +173,40 @@
         
         if (horariosLivres.length === 0) {
             let option = document.createElement('option');
-            option.textContent = "Nenhum horário livre para este dia";
+            option.textContent = "Nenhum horário livre";
             option.value = "";
             selectHorario.appendChild(option);
-            return;
+        } else {
+            horariosLivres.forEach(hora => {
+                let option = document.createElement('option');
+                option.value = hora;
+                option.textContent = hora;
+                selectHorario.appendChild(option);
+            });
         }
+        validarBotao();
+    }
 
-        horariosLivres.forEach(hora => {
-            let option = document.createElement('option');
-            option.value = hora;
-            option.textContent = hora;
-            selectHorario.appendChild(option);
-        });
+    function validarBotao() {
+        const btn = document.getElementById('btnEnviar');
+        const horaVal = document.getElementById('horario').value;
+        
+        if (!horaVal || horaVal === "") {
+            btn.disabled = true;
+            btn.textContent = "Agenda Fechada para este Dia";
+            btn.style.background = "#ccc";
+        } else {
+            btn.disabled = false;
+            btn.textContent = "Avançar Agendamento";
+            btn.style.background = "#007bff";
+        }
     }
 
     document.getElementById('formCliente').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const horaSel = document.getElementById('horario').value;
-        if (!horaSel) {
-            alert('Por favor, selecione um dia que possua horários livres.');
-            return;
-        }
+        if (!horaSel || horaSel === "") return;
 
         const nome = document.getElementById('nome').value;
         const telefone = document.getElementById('telefone').value;
@@ -154,13 +214,11 @@
         const data = document.getElementById('data').value;
         const dataFormatada = data.split('-').reverse().join('/');
 
-        // Salva localmente para aparecer no painel adm
         const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
-        const novoAgendamento = { id: Date.now(), nome: nome, telefone: telefone, servico: servico, data: data, hora: horaSel };
+        const novoAgendamento = { id: Date.now(), nome, telefone, servico, data, hora: horaSel };
         agendamentos.push(novoAgendamento);
         localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
 
-        // Monta o texto limpo para a API do WhatsApp
         const textoMensagem = "Olá! Gostaria de confirmar um agendamento:\n\n" +
                               "👤 Nome: " + nome + "\n" +
                               "📱 Contato: " + telefone + "\n" +
@@ -170,13 +228,16 @@
 
         const urlLinkLink = "https://whatsapp.com" + SEU_NUMERO_WHATSAPP + "&text=" + encodeURIComponent(textoMensagem);
 
-        // Limpa o formulário antes de ir para o WhatsApp
+        // Configura o link do botão final do WhatsApp dentro do popup
+        document.getElementById('linkWhatsFinal').href = urlLinkLink;
+
+        // Abre a caixinha de aviso na tela do cliente
+        document.getElementById('meuModal').style.display = "flex";
+
+        // Limpa o formulário de fundo
         document.getElementById('formCliente').reset();
         document.getElementById('data').value = hoje;
         atualizarHorariosDaData();
-
-        // Envio definitivo aceito por qualquer celular
-        window.location.href = urlLinkLink;
     });
 
     window.addEventListener('storage', function() { atualizarHorariosDaData(); });
