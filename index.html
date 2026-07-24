@@ -180,7 +180,7 @@
         document.getElementById('formCliente').reset();
         document.getElementById('data').value = hoje;
         atualizarHorariosDaData();
-        window.open(urlLinkLink, '_blank');
+        window.location.href = urlLinkLink;
     });
 
     window.addEventListener('storage', function() { atualizarHorariosDaData(); });
