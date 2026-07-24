@@ -16,16 +16,39 @@
             min-height: 100vh;
             box-sizing: border-box;
         }
-        .btn-adm-topo { 
-            background: #333; 
-            color: white; 
-            padding: 8px 16px; 
-            text-decoration: none; 
-            border-radius: 20px; 
-            font-weight: bold; 
-            margin-bottom: 15px; 
-            font-size: 12px; 
+        
+        /* MENU SUPERIOR COM DOIS BOTÕES */
+        .menu-topo {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 450px;
         }
+        .btn-menu {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        .btn-ativo {
+            background: #25d366;
+            color: white;
+        }
+        .btn-inativo {
+            background: #e9ecef;
+            color: #333;
+            border: 1px solid #ced4da;
+        }
+        .btn-inativo:hover {
+            background: #dee2e6;
+        }
+
         .box { 
             background: white; 
             padding: 20px; 
@@ -94,19 +117,18 @@
             font-weight: bold;
             font-size: 18px;
             margin-top: 20px;
-            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
         }
     </style>
 </head>
 <body>
 
-<a href="admin.html" class="btn-adm-topo">⚙️ Painel de Controle</a>
+<!-- MENU DE NAVEGAÇÃO -->
+<div class="menu-topo">
+    <a href="index.html" class="btn-menu btn-ativo">📅 Fazer Agendamento</a>
+    <a href="admin.html" class="btn-menu btn-inativo">⚙️ Painel de Controle</a>
+</div>
 
 <div class="box">
-    <div style="text-align: center; margin-bottom: 20px;">
-    <!-- Mudamos de 120px para 180px para dar mais destaque -->
-    <img src="logo-sbbronze.png" alt="Logo da Empresa" style="max-width: 180px; width: 100%; height: auto; border-radius: 8px;">
-</div>
     <h2>Agendar Atendimento</h2>
     <form id="formCliente">
         <div class="form-group">
@@ -120,8 +142,8 @@
         <div class="form-group">
             <label for="servico">Escolha o Serviço:</label>
             <select id="servico" required>
-                <option value="Bronzeamento">Bronzeamento</option>
-                <option value="Bronzeamento + Banho de Lua">Bronzeamento + Banho de Lua</option>
+                <option value="Serviço Padrão 1">Serviço Padrão 1</option>
+                <option value="Serviço Completo 2">Serviço Completo 2</option>
                 <option value="Consulta Avançada">Consulta Avançada</option>
                 <option value="Manutenção Geral">Manutenção Geral</option>
             </select>
@@ -141,19 +163,18 @@
 <div id="meuModal" class="modal-sucesso">
     <div class="modal-conteudo">
         <h3 style="color: #28a745; margin-top: 0;">🎉 Quase Pronto!</h3>
-        <p style="color: #555; font-size: 15px; line-height: 1.4;">Seus dados foram salvos no painel. Clique no botão abaixo para abrir seu WhatsApp e enviar os detalhes da sua reserva.</p>
-        <a id="linkWhatsFinal" href="#" class="btn-whats-final">🟢 ENVIAR NO WHATSAPP</a>
+        <p style="color: #555; font-size: 15px;">Seus dados foram salvos no painel. Clique abaixo para abrir seu WhatsApp e enviar.</p>
+        <a id="linkWhatsFinal" href="#" target="_blank" class="btn-whats-final">🟢 ENVIAR NO WHATSAPP</a>
     </div>
 </div>
 
 <script>
     // ==========================================
-    // CONFIGURAÇÃO: INSIRA SEU WHATSAPP REAL AQUI
-    // IMPORTANTE: Use o formato "55" + DDD + Número. Apenas números!
-    const SEU_NUMERO_WHATSAPP = "5524992177668"; 
+    // CONFIGURAÇÃO: INSIRA SEU WHATSAPP REAL ABAIXO
+    const SEU_NUMERO_WHATSAPP = "5500000000000"; 
     // ==========================================
 
-    const hoje = new Date().toISOString().split('T')[0];
+    const hoje = new Date().toISOString().split('T');
     document.getElementById('data').value = hoje;
     document.getElementById('data').min = hoje;
 
@@ -226,15 +247,10 @@
                               "📅 Data: " + dataFormatada + "\n" +
                               "⏰ Horário: " + horaSel;
 
-        // ATUALIZAÇÃO DA URL: Usando o formato 'wa.me' à prova de bloqueios de navegadores mobile
-        const urlLinkLink = "https://wa.me" + "/" + SEU_NUMERO_WHATSAPP + "?text=" + encodeURIComponent(textoMensagem);
+        const urlLinkLink = "https://wa.me" + SEU_NUMERO_WHATSAPP + "?text=" + encodeURIComponent(textoMensagem);
 
         document.getElementById('linkWhatsFinal').href = urlLinkLink;
         document.getElementById('meuModal').style.display = "flex";
-
-        document.getElementById('formCliente').reset();
-        document.getElementById('data').value = hoje;
-        atualizarHorariosDaData();
     });
 
     window.addEventListener('storage', function() { atualizarHorariosDaData(); });
