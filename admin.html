@@ -2,37 +2,136 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Administrativo - Agenda por Dia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Mobile</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .box { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 600px; box-sizing: border-box; margin-bottom: 20px; }
-        h2 { margin-top: 0; color: #d9534f; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f4f7f6; 
+            margin: 0; 
+            padding: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        h1 { font-size: 22px; color: #333; text-align: center; margin: 10px 0 20px 0; }
+
+        .box { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            width: 100%; 
+            max-width: 450px; 
+            box-sizing: border-box; 
+            margin-bottom: 15px; 
+        }
+
+        h2 { margin-top: 0; color: #d9534f; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 18px; }
         .control-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        .gerenciar-horarios { display: flex; gap: 10px; margin-bottom: 15px; }
-        input[type="date"], input[type="time"] { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: #555; font-size: 14px; }
+        
+        /* Inputs confortáveis para o touch screen */
+        input[type="date"], input[type="time"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            background-color: #fff;
+        }
+
+        .gerenciar-horarios { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+        }
+
+        /* Botões Mobile-First */
+        .btn { 
+            width: 100%; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            color: white; 
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            -webkit-tap-highlight-color: transparent;
+        }
         .btn-add { background: #28a745; }
-        .btn-danger { background: #d9534f; padding: 5px 10px; font-size: 12px; }
-        .badge-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; min-height: 40px; padding: 10px; background: #fafafa; border: 1px dashed #ccc; border-radius: 4px; }
-        .badge { background: #007bff; color: white; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-size: 14px; border: 1px solid #0056b3; }
-        .badge span { cursor: pointer; color: #fff; font-weight: bold; background: rgba(0,0,0,0.2); width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-        .lista-agendamentos { margin-top: 15px; border: 1px solid #ddd; padding: 10px; border-radius: 4px; background: #fafafa; }
-        .agendamento-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-        .agendamento-item:last-child { border-bottom: none; }
+        .btn-add:active { background: #1e7e34; }
+        .btn-danger { background: #d9534f; padding: 10px; font-size: 14px; margin-top: 8px; }
+        .btn-danger:active { background: #bd2130; }
+
+        /* Container de Badges Responsivo */
+        .badge-container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            margin-top: 10px; 
+            min-height: 40px; 
+            padding: 12px; 
+            background: #fafafa; 
+            border: 1px dashed #ccc; 
+            border-radius: 8px; 
+        }
+        .badge { 
+            background: #007bff; 
+            color: white; 
+            padding: 8px 14px; 
+            border-radius: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-size: 15px; 
+            font-weight: bold;
+        }
+        .badge span { 
+            cursor: pointer; 
+            color: #fff; 
+            font-weight: bold; 
+            background: rgba(0,0,0,0.2); 
+            width: 22px; 
+            height: 22px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 50%; 
+        }
+
+        /* Lista de marcações limpa para celular */
+        .lista-agendamentos { margin-top: 15px; }
+        .agendamento-item { 
+            background: #f9f9f9;
+            padding: 15px; 
+            border: 1px solid #eee;
+            border-radius: 8px;
+            font-size: 15px; 
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .agendamento-info { margin-bottom: 8px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-<h1 style="color: #333; margin-bottom: 20px;">Painel de Controle por Dia</h1>
+<h1>Painel de Controle Mobile</h1>
 
 <div class="box">
-    <h2>1. Selecione o Dia para Liberar Vagas</h2>
+    <h2>1. Selecione a Data</h2>
     <div class="control-group">
         <input type="date" id="dataFiltro" onchange="mudarDataPainel()">
     </div>
 
-    <h2>2. Habilitar Horário de Atendimento</h2>
+    <h2>2. Liberar Horário para esta Data</h2>
     <div class="gerenciar-horarios">
         <input type="time" id="novaHora" value="09:00">
         <button class="btn btn-add" onclick="adicionarHorario()">+ Abrir Horário</button>
@@ -49,12 +148,11 @@
 
 <script>
     const hoje = new Date().toISOString().split('T')[0];
-    document.getElementById('dataFiltro').value = sprintfDate(hoje);
+    document.getElementById('dataFiltro').value = hoje;
 
     let agendaPorDia = JSON.parse(localStorage.getItem('agendaPorDia')) || {};
     let agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
 
-    function sprintfDate(dateStr) { return dateStr; }
     function obterDataSelecionada() { return document.getElementById('dataFiltro').value; }
     function mudarDataPainel() { renderizarGrade(); }
 
@@ -62,26 +160,22 @@
         const dataSel = obterDataSelecionada();
         if (!dataSel) return;
 
-        document.getElementById('labelGrade').textContent = `Horários abertos no dia ${dataSel.split('-').reverse().join('/')}:`;
+        document.getElementById('labelGrade').textContent = `Horários abertos em ${dataSel.split('-').reverse().join('/')}:`;
 
-        // INICIALIZAÇÃO FIXADA: Começa totalmente vazio (agenda fechada por padrão)
-        if (!agendaPorDia[dataSel]) {
-            agendaPorDia[dataSel] = [];
-        }
+        if (!agendaPorDia[dataSel]) { agendaPorDia[dataSel] = []; }
 
         const container = document.getElementById('gradeHorarios');
         container.innerHTML = '';
-        
         agendaPorDia[dataSel].sort();
 
         if (agendaPorDia[dataSel].length === 0) {
-            container.innerHTML = '<span style="color:#cc0000; font-weight:bold; font-size:14px;">Agenda fechada. Nenhum horário disponível para este dia.</span>';
+            container.innerHTML = '<span style="color:#cc0000; font-weight:bold; font-size:14px;">Agenda fechada para este dia.</span>';
         }
 
         agendaPorDia[dataSel].forEach(hora => {
             let badge = document.createElement('div');
             badge.className = 'badge';
-            badge.innerHTML = `${hora} <span onclick="removerHorario('${hora}')" title="Bloquear horário">&times;</span>`;
+            badge.innerHTML = `${hora} <span onclick="removerHorario('${hora}')">&times;</span>`;
             container.appendChild(badge);
         });
 
@@ -119,11 +213,12 @@
             let item = document.createElement('div');
             item.className = 'agendamento-item';
             item.innerHTML = `
-                <div>
-                    <strong>Data: ${agendamento.data.split('-').reverse().join('/')} às ${agendamento.hora}</strong><br>
-                    <span>Cliente: ${agendamento.nome} (${agendamento.telefone})</span>
+                <div class="agendamento-info">
+                    <strong style="color:#007bff;">📅 ${agendamento.data.split('-').reverse().join('/')} às ${agendamento.hora}</strong><br>
+                    <strong>👤 Cliente:</strong> ${agendamento.nome}<br>
+                    <strong>📱 Whats:</strong> ${agendamento.telefone}
                 </div>
-                <button class="btn btn-danger" onclick="excluirAgendamento(${agendamento.id})">Concluir</button>
+                <button class="btn btn-danger" onclick="excluirAgendamento(${agendamento.id})">Marcar como Concluído</button>
             `;
             listaDiv.appendChild(item);
         });
